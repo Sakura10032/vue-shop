@@ -35,41 +35,41 @@
 </template>
 
 <script>
-export default {
-  data () {
-    return {
-      loginForm: {
-        username: 'admin',
-        password: '123456'
+  export default {
+    data () {
+      return {
+        loginForm: {
+          username: 'admin',
+          password: '123456'
+        },
+        loginFormRules: {
+          username: [
+            { required: true, message: '请输入登录名称', trigger: 'blur' },
+            { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '请输入登录密码', trigger: 'blur' },
+            { min: 6, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' }
+          ]
+        }
+      }
+    },
+    methods: {
+      resetLoginForm () {
+        this.$refs.loginFormRef.resetFields()
       },
-      loginFormRules: {
-        username: [
-          { required: true, message: '请输入登录名称', trigger: 'blur' },
-          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, message: '请输入登录密码', trigger: 'blur' },
-          { min: 6, max: 15, message: '长度在 3 到 15 个字符', trigger: 'blur' }
-        ]
+      login () {
+        this.$refs.loginFormRef.validate(async valid => {
+          if (!valid) return
+          const { data: res } = await this.$http.post('login', this.loginForm)
+          if (res.meta.status !== 200) return this.$message.error('登录失败！')
+          this.$message.success('登录成功！')
+          window.sessionStorage.setItem('token', res.data.token)
+          await this.$router.push('/home')
+        })
       }
     }
-  },
-  methods: {
-    resetLoginForm () {
-      this.$refs.loginFormRef.resetFields()
-    },
-    login () {
-      this.$refs.loginFormRef.validate(async valid => {
-        if (!valid) return
-        const { data: res } = await this.$http.post('login', this.loginForm)
-        if (res.meta.status !== 200) return this.$message.error('登录失败！')
-        this.$message.success('登录成功！')
-        window.sessionStorage.setItem('token', res.data.token)
-        await this.$router.push('/home')
-      })
-    }
   }
-}
 </script>
 
 <style lang="less" scoped>
