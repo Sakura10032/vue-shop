@@ -19,6 +19,8 @@
           :collapse-transition="false"
           active-text-color="#ffd04b"
           background-color="#333744"
+          :default-active="$route.path"
+          router
           text-color="#fff"
           unique-opened>
           <!-- 一级菜单 -->
@@ -30,7 +32,8 @@
               <span>{{item['authName']}}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subItem.id + ''" :key="subItem.id" v-for="subItem in item.children">
+            <el-menu-item :index="'/' + subItem.path" :key="subItem.id" @click="saveNavState('/' + subItem.path)"
+                          v-for="subItem in item.children">
               <template slot="title">
                 <!--  图标  -->
                 <i class="el-icon-menu"/>
@@ -42,7 +45,9 @@
         </el-menu>
       </el-aside>
       <!--   右侧主体内容   -->
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -53,11 +58,13 @@
       return {
         menuList: [],
         // 是否折叠
-        isCollapse: false
+        isCollapse: false,
+        activePath: ''
       }
     },
     created () {
       this.getMenuList()
+      this.activePath = window.sessionStorage.getItem('activePath')
     },
     methods: {
       logout () {
@@ -74,6 +81,10 @@
       // 菜单折叠和展开
       toggleCollapse () {
         this.isCollapse = !this.isCollapse
+      },
+      saveNavState (activePath) {
+        window.sessionStorage.setItem('activePath', activePath)
+        this.activePath = activePath
       }
     }
   }
